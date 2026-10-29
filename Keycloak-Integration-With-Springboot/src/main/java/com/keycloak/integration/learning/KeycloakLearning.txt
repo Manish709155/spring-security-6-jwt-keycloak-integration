@@ -1,0 +1,171 @@
+1.What is Keycloak?
+
+Keycloak is an open-source Identity and Access Management (IAM) tool that provides authentication and authorization for applications and APIs.
+
+In simple words:
+
+Instead of creating your own login, registration, password reset, OTP, social login, and role management system, you can use Keycloak to handle all of them.
+
+
+2.Why Keycloak?
+
+Keycloak provides:
+
+Single Sign-On (SSO)
+User Authentication
+User Registration
+Password Reset
+Role-Based Access Control (RBAC)
+OAuth 2.0 Support
+OpenID Connect (OIDC) Support
+SAML Support
+Social Login (Google, GitHub, Facebook, etc.)
+Multi-Factor Authentication (MFA)
+User Federation (LDAP, Active Directory)
+
+----------------- LDAP -----------------
+
+LDAP = Lightweight Directory Access Protocol
+
+LDAP is a protocol used to access and manage directory services such as user accounts, groups, and organizational information.
+
+
+Example Flow:
+
+Keycloak -> LDAP Server (Active Directory)
+         -> Validate User Credentials
+
+
+Common LDAP Servers:
+
+Microsoft Active Directory (AD)
+OpenLDAP
+Apache Directory Server
+
+
+-------------- SAML ---------------
+
+
+SAML = Security Assertion Markup Language
+
+
+SAML is an XML-based standard used for Single Sign-On (SSO) between an Identity Provider (IdP) and a Service Provider (SP).
+
+
+Example Flow:
+
+User
+  |
+  v
+Application (SP)
+  |
+  v
+Identity Provider (Keycloak, Okta, ADFS)
+  |
+  v
+SAML Assertion
+  |
+  v
+Application Access Granted
+
+
+------------- OAuth2 vs SAML ------------------
+
+
+OAuth2                                  SAML
+
+
+Token Based                             XML Assertion Based
+
+
+API Security                            Enterprise SSO
+
+Mobile & Web Apps                       Enterprise Applications
+
+Uses Access Token (JWT)                 Uses SAML Assertion
+
+Lightweight                             Relatively Heavy
+
+------------ Interview Answer: ---------------
+
+OAuth 2.0 is mainly used for API authorization, whereas SAML is primarily used for enterprise Single Sign-On (SSO).
+
+
+
+-------------- About Enterprise Application -------------------------
+
+An Enterprise Application is a large-scale software application used by organizations (companies, banks, hospitals, universities, government agencies) to support business operations and serve many users at the same time.
+
+Simple Definition
+
+An Enterprise Application is a business application designed for large organizations that requires high security, scalability, reliability, and user management.
+
+Examples:
+
+Organization	          Enterprise Application
+
+Bank	                  Internet Banking System
+
+Hospital	          Hospital Management System
+
+Company	                  Employee Management System
+
+University	          Student Information System
+
+E-commerce	          Amazon, Flipkart Backend Systems
+
+
+-- Characteristics of Enterprise Applications
+
+Multiple users
+
+High security
+
+Role-based access control
+
+Authentication and authorization
+
+Scalability
+
+High availability
+
+Database integration
+
+Audit logging
+
+Integration with LDAP/Active Directory
+
+----------------Interview Definition ------------
+
+Keycloak is an open-source Identity and Access Management (IAM) solution that provides authentication, authorization, Single Sign-On (SSO), OAuth 2.0, OpenID Connect, SAML, user management, role management, and social login capabilities for securing applications and APIs.
+
+Common Interview Questions
+
+Q1. What is Keycloak?
+ An open-source IAM tool used for authentication and authorization.
+
+Q2. What is a Realm in Keycloak?
+ A Realm is an isolated security domain containing users, roles, groups, and clients.
+
+Q3. What is a Client in Keycloak?
+ A Client is an application secured by Keycloak.
+
+Q4. Which protocols does Keycloak support?
+ OAuth 2.0, OpenID Connect (OIDC), and SAML.
+
+Q5. What is SSO?
+ Single Sign-On allows a user to log in once and access multiple applications without logging in again.
+
+Since you're learning OAuth 2.0 and Spring Boot, the most common real-world setup is:
+
+
+React/Angular UI
+       |
+       v
+    Keycloak
+       |
+       v
+Spring Boot Resource Server
+       |
+       v
+    Database

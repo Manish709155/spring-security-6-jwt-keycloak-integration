@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: Keycloak-Integration-With-Springboot
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: my_testing_keycloak_client_id
+            scope: openid
+
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/my_testing_realm_keycloak
+
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/my_testing_realm_keycloak
+
+server:
+  port: 9090
+
+logging:
+  level:
+    org:
+      springframework:
+        security: trace

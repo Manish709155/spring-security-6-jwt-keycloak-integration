@@ -1,0 +1,710 @@
+====================================================
+KEYCLOAK 26.8.1 SETUP AND ACCESS TOKEN GENERATION
+====================================================
+
+Prerequisites
+-------------
+1. Java 17 or higher installed.
+2. Port 8080 should be free.
+3. Internet connection for downloading Keycloak.
+
+====================================================
+STEP 1 : DOWNLOAD KEYCLOAK
+====================================================
+
+Download Keycloak from:
+
+https://www.keycloak.org/downloads
+
+Download:
+
+Keycloak ZIP Distribution (Windows)
+
+Extract the downloaded ZIP file.
+
+Example Location:
+
+C:\Users\<USERNAME>\Downloads\keycloak-26.8.1\keycloak-26.8.1
+
+====================================================
+STEP 2 : START KEYCLOAK SERVER
+====================================================
+
+Open Command Prompt.
+
+Go to Keycloak bin directory:
+
+cd C:\Users\<USERNAME>\Downloads\keycloak-26.8.1\keycloak-26.8.1\bin
+
+Run Keycloak in development mode:
+
+kc.bat start-dev
+
+Wait until you see:
+
+Listening on: http://0.0.0.0:8080
+
+====================================================
+STEP 3 : IF PORT 8080 IS ALREADY IN USE
+====================================================
+
+Check process running on port 8080:
+
+netstat -ano | findstr :8080
+
+Example Output:
+
+TCP    0.0.0.0:8080    0.0.0.0:0    LISTENING    4404
+
+Kill process:
+
+taskkill /F /PID 4404
+
+Verify port is free:
+
+netstat -ano | findstr :8080
+
+No output means port is free.
+
+====================================================
+STEP 4 : CREATE ADMIN USER
+====================================================
+
+Open Browser:
+
+http://localhost:8080
+
+Click:
+
+Create administrative user
+
+Enter Details:
+
+Username:
+
+<ADMIN_USERNAME>
+
+Password:
+
+<ADMIN_PASSWORD>
+
+Email:
+
+<ADMIN_EMAIL>
+
+First Name:
+
+<ADMIN_FIRST_NAME>
+
+Last Name:
+
+<ADMIN_LAST_NAME>
+
+Click:
+
+Create
+
+Login using:
+
+Username:
+
+<ADMIN_USERNAME>
+
+Password:
+
+<ADMIN_PASSWORD>
+
+====================================================
+STEP 5 : OPEN ADMIN CONSOLE
+====================================================
+
+URL:
+
+http://localhost:8080/admin/master/console/
+
+After successful login Keycloak Admin Console will open.
+
+====================================================
+STEP 6 : CREATE REALM
+====================================================
+
+Click Top Left Dropdown
+
+Select:
+
+Create Realm
+
+Realm Name:
+
+my-testing-realm
+
+Click:
+
+Create
+
+Realm Created Successfully.
+
+====================================================
+STEP 7 : CREATE ROLE
+====================================================
+
+Inside my-testing-realm
+
+Go To:
+
+Realm Roles
+
+Click:
+
+Create Role
+
+Role Name:
+
+USER
+
+Click:
+
+Create
+
+Create another role:
+
+ADMIN
+
+Click:
+
+Create
+
+====================================================
+STEP 8 : CREATE USER
+====================================================
+
+Go To:
+
+Users
+
+Click:
+
+Add User
+
+Username:
+
+<USERNAME>
+
+Email:
+
+<EMAIL>
+
+First Name:
+
+<FIRST_NAME>
+
+Last Name:
+
+<LAST_NAME>
+
+Email Verified:
+
+ON
+
+Enabled:
+
+ON
+
+Click:
+
+Create
+
+====================================================
+STEP 9 : SET PASSWORD FOR USER
+====================================================
+
+Users
+ → <USERNAME>
+ → Credentials
+
+Set Password:
+
+<PASSWORD>
+
+Temporary:
+
+OFF
+
+Click:
+
+Set Password
+
+Confirm Password.
+
+====================================================
+STEP 10 : ASSIGN ROLE TO USER
+====================================================
+
+Users
+ → <USERNAME>
+ → Role Mapping
+
+Click:
+
+Assign Role
+
+Select:
+
+USER
+
+or
+
+ADMIN
+
+Click:
+
+Assign
+
+====================================================
+STEP 10A : VERIFY ROLE MAPPING
+====================================================
+
+Users
+ → <USERNAME>
+ → Role Mapping
+
+Verify Assigned Roles.
+
+Example:
+
+Assigned Roles
+-----------------------
+USER
+
+or
+
+Assigned Roles
+-----------------------
+ADMIN
+
+Important:
+
+At least one role must be assigned.
+
+If USER role is not assigned and Spring Security
+configuration contains:
+
+.hasRole("USER")
+
+Then API access will fail with:
+
+403 Forbidden
+
+Error:
+
+AuthorizationDeniedException: Access Denied
+
+====================================================
+STEP 11 : CREATE CLIENT
+====================================================
+
+Go To:
+
+Clients
+
+Click:
+
+Create Client
+
+Client Type:
+
+OpenID Connect
+
+Client ID:
+
+my_testing_keycloak
+
+Click:
+
+Next
+
+====================================================
+STEP 12 : CLIENT CONFIGURATION
+====================================================
+
+General Settings
+
+Client ID:
+
+my_testing_keycloak
+
+Client Authentication:
+
+OFF
+
+Authorization:
+
+OFF
+
+Standard Flow:
+
+ON
+
+Direct Access Grants:
+
+ON
+
+Click:
+
+Save
+
+Important:
+
+Direct Access Grants must be ON.
+
+Otherwise:
+
+{
+  "error":"unauthorized_client",
+  "error_description":"Client not allowed for direct access grants"
+}
+
+====================================================
+STEP 13 : VERIFY USER SETTINGS
+====================================================
+
+Users
+ → <USERNAME>
+
+Check:
+
+Enabled = ON
+
+Credentials:
+Temporary = OFF
+
+Required Actions:
+Empty
+
+Email Verified:
+ON
+
+Otherwise:
+
+{
+  "error":"invalid_grant",
+  "error_description":"Account is not fully set up"
+}
+
+====================================================
+STEP 13A : VERIFY ROLE IN JWT TOKEN
+====================================================
+
+After generating Access Token:
+
+Copy token.
+
+Open:
+
+https://jwt.io
+
+Paste the Access Token.
+
+Verify that role exists inside:
+
+realm_access
+
+Example:
+
+{
+  "realm_access": {
+    "roles": [
+      "USER"
+    ]
+  }
+}
+
+OR
+
+{
+  "resource_access": {
+    "my_testing_keycloak": {
+      "roles": [
+        "USER"
+      ]
+    }
+  }
+}
+
+Important:
+
+If USER role is not present inside JWT token,
+Spring Security will deny access.
+
+Example:
+
+403 Forbidden
+
+AuthorizationDeniedException: Access Denied
+
+Generate a NEW token after assigning roles.
+
+Old tokens do not contain newly assigned roles.
+
+====================================================
+STEP 14 : TOKEN ENDPOINT
+====================================================
+
+Open Postman
+
+Request Type:
+
+POST
+
+URL:
+
+http://localhost:8080/realms/my-testing-realm/protocol/openid-connect/token
+
+Note:
+
+Replace realm name if different.
+
+====================================================
+STEP 15 : POSTMAN CONFIGURATION
+====================================================
+
+Body
+
+Select:
+
+x-www-form-urlencoded
+
+Add Parameters:
+
+Key              Value
+-------------------------------------
+client_id        my_testing_keycloak
+username         <USERNAME>
+password         <PASSWORD>
+grant_type       password
+
+====================================================
+STEP 16 : SEND REQUEST
+====================================================
+
+Click:
+
+Send
+
+====================================================
+STEP 17 : SUCCESS RESPONSE
+====================================================
+
+Example Response:
+
+{
+  "access_token":"eyJhbGciOi...",
+  "expires_in":300,
+  "refresh_expires_in":1800,
+  "refresh_token":"eyJhbGciOi...",
+  "token_type":"Bearer",
+  "scope":"profile email"
+}
+
+Status:
+
+200 OK
+
+====================================================
+STEP 18 : USE ACCESS TOKEN
+====================================================
+
+Authorization Header:
+
+Authorization: Bearer <access_token>
+
+Example:
+
+Authorization: Bearer eyJhbGciOiJIUz...
+
+====================================================
+STEP 19 : ACCESS PROTECTED SPRING BOOT API
+====================================================
+
+Example:
+
+GET http://localhost:9090/user/keycloak/test
+
+Header:
+
+Authorization: Bearer <access_token>
+
+If USER role is available:
+
+Response:
+
+200 OK
+
+User has been fetch successfully!
+
+If USER role is missing:
+
+Response:
+
+403 Forbidden
+
+====================================================
+COMMON ERRORS
+====================================================
+
+1. Port Already In Use
+
+Error:
+
+Port 8080 was already in use
+
+Solution:
+
+netstat -ano | findstr :8080
+
+taskkill /F /PID <PID>
+
+----------------------------------------------------
+
+2. Direct Access Grants Disabled
+
+Error:
+
+{
+  "error":"unauthorized_client"
+}
+
+Solution:
+
+Clients
+→ my_testing_keycloak
+→ Direct Access Grants
+→ ON
+
+----------------------------------------------------
+
+3. Password Temporary
+
+Error:
+
+{
+  "error":"invalid_grant",
+  "error_description":"Account is not fully set up"
+}
+
+Solution:
+
+Users
+→ Credentials
+
+Temporary = OFF
+
+----------------------------------------------------
+
+4. Required Actions Pending
+
+Error:
+
+{
+  "error":"invalid_grant",
+  "error_description":"Account is not fully set up"
+}
+
+Solution:
+
+Users
+→ Required Actions
+
+Remove all actions.
+
+----------------------------------------------------
+
+5. Role Not Assigned
+
+Error:
+
+403 Forbidden
+
+AuthorizationDeniedException: Access Denied
+
+Solution:
+
+Users
+→ Role Mapping
+→ Assign Role
+→ USER
+
+Generate a new Access Token.
+
+----------------------------------------------------
+
+6. Role Missing In JWT Token
+
+Error:
+
+403 Forbidden
+
+Solution:
+
+Check JWT token using:
+
+https://jwt.io
+
+Verify:
+
+realm_access.roles
+
+or
+
+resource_access.<client-id>.roles
+
+contains:
+
+USER
+
+Generate a new token after assigning roles.
+
+====================================================
+PROJECT FLOW
+====================================================
+
+User
+  |
+  v
+Client (Postman/Application)
+  |
+  v
+Keycloak Token Endpoint
+  |
+  v
+Validate User Credentials
+  |
+  v
+Load User Roles
+  |
+  v
+Generate JWT Access Token
+  |
+  v
+Return Access Token
+  |
+  v
+Spring Boot Resource Server
+  |
+  v
+Validate Token
+  |
+  v
+Validate Roles
+  |
+  +---- ROLE_USER ----> Access Granted
+  |
+  +---- Role Missing --> 403 Forbidden
+
+====================================================
+END
+====================================================
+
+For More Details:
+
+https://www.youtube.com/watch?v=KnePPcLBzSU&list=PL04i_qOQpU66e6asW4knA_O9HixUIKN13&index=1
